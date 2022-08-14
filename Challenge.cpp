@@ -1,4 +1,5 @@
 #include <list>
+// #include <cctype>
 #include <limits>
 #include <iomanip>
 #include <iostream>
@@ -53,12 +54,11 @@ void play_current_song(const list<Song>::iterator &current_song) {
     cout << "Playing:\n" << *current_song << endl;
 }
 
-void display_playlist(const list<Song> &playlist, const Song &current_song) {
+void display_playlist(const list<Song> &playlist, list<Song>::iterator &current_song) {
     for(const auto &song : playlist) {
         cout << song << endl;
     }
-
-    cout << "Current song:\n" << current_song << endl;
+    play_current_song(current_song);
 }
 
 void play_first_song(const list<Song> &playlist) {
@@ -74,12 +74,12 @@ void play_next_song(list<Song> &playlist, list<Song>::iterator &current_song) {
     play_current_song(current_song);
 }
 
-void play_previous_song(list<Song> &playlist, list<Song>::iterator& current_song) {
-    if(current_song == playlist.begin()) {
-        current_song = playlist.end();
+void play_previous_song(list<Song> &playlist, list<Song>::iterator &current_song_it) {
+    if(current_song_it == playlist.begin()) {
+        current_song_it = playlist.end();
     }
-    current_song--;
-    play_current_song(current_song);
+    current_song_it--;
+    play_current_song(current_song_it);
 }
 
 bool IsRight(const int &val) {
@@ -121,52 +121,39 @@ int main() {
 
     auto current_song = playlist.begin();
 
-    display_playlist(playlist,*current_song);
+    display_playlist(playlist,current_song);
     char selection{};
     do {
         display_menu();
         cin >> selection;
+        selection = toupper(selection);
         switch(selection) {
-            case 'f': {
             case 'F': 
                 play_first_song(playlist);
                 break;
-            }
 
-            case 'n': {
-            case 'N': 
+            case 'N':  
                 play_next_song(playlist, current_song);
                 break;
-            }
 
-            case 'p': {
             case 'P': 
                 play_previous_song(playlist, current_song);
                 break;
-            }
 
-            case 'a': {
-            case 'A': 
+            case 'A':  
                 add_and_play_new_song(playlist, current_song);
                 break;
-            }
 
-            case 'l': {
             case 'L': 
-                display_playlist(playlist, *current_song);
+                display_playlist(playlist, current_song);
                 break;
-            }
 
-            case 'q': {
             case 'Q': 
                 continue;
-            }
 
-            default : {
+            default : 
                 cout << "You did smth wrong, try again!" << endl;
                 break;
-            }
-            
         }
     } while (selection != 'q' && selection != 'Q');
     
@@ -176,5 +163,7 @@ int main() {
 
     return 0;
 }
+
+
 
 
