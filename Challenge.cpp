@@ -49,8 +49,8 @@ void display_menu() {
     std::cout << "Enter a selection (Q to quit): ";
 }
 
-void play_current_song(const Song &song) {
-    cout << "Playing:\n" << song << endl;
+void play_current_song(const list<Song>::iterator &current_song) {
+    cout << "Playing:\n" << *current_song << endl;
 }
 
 void display_playlist(const list<Song> &playlist, const Song &current_song) {
@@ -66,13 +66,20 @@ void play_first_song(const list<Song> &playlist) {
     cout << "Playing:\n" << *first_song_in_playlist << endl;
 }
 
-void play_next_song(const list<Song> &playlist, auto current_song) {
-    
-    
+void play_next_song(list<Song> &playlist, list<Song>::iterator &current_song) {
+    current_song++;
+    if(current_song == playlist.end()) {
+        current_song = playlist.begin();
+    }
+    play_current_song(current_song);
 }
 
-void play_previous_song(const list<Song> &playlist, auto current_song) {
-    
+void play_previous_song(list<Song> &playlist, list<Song>::iterator& current_song) {
+    if(current_song == playlist.begin()) {
+        current_song = playlist.end();
+    }
+    current_song--;
+    play_current_song(current_song);
 }
 
 bool IsRight(const int &val) {
@@ -128,23 +135,13 @@ int main() {
 
             case 'n': {
             case 'N': 
-                // play_next_song(playlist, current_song);
-                current_song++;
-                if(current_song == playlist.end()  ) {
-                    current_song == playlist.begin();
-                }
-                cout << "Playing:\n" << *current_song << endl;
+                play_next_song(playlist, current_song);
                 break;
             }
 
             case 'p': {
             case 'P': 
-                // play_previous_song(playlist, current_song);
-                if(current_song == playlist.begin()) {
-                    current_song = playlist.end();
-                }
-                current_song--;
-                cout << "Playing:\n" << *current_song << endl;
+                play_previous_song(playlist, current_song);
                 break;
             }
 
