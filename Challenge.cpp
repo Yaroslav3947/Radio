@@ -1,25 +1,34 @@
 #include <list>
-// #include <cctype>
 #include <limits>
 #include <iomanip>
 #include <iostream>
 #include <algorithm>
-using namespace std;
 
+const short MINRATE = 1;
+const short MAXRATE = 5;
+
+enum Selection {
+    PLAYFIRST = 'F',
+    PLAYNEXT = 'N',
+    PLAYPRVIOUS = 'P',
+    ADD = 'A',
+    LISTPLAYLIST = 'L',
+    QUIT = 'Q'
+};
 class Song {
-    friend ostream &operator <<(ostream &os, const Song &obj);
-    string name;
-    string artist;
+    friend std::ostream &operator <<(std::ostream &os, const Song &obj);
+    std::string name;
+    std::string artist;
     int rating;
 public:
     Song() = default;
     ~Song() = default;
-    Song(string name, string artist, int rating)
+    Song(std::string name, std::string artist, int rating)
         :name{name},artist{artist},rating{rating}{}
-    string get_name() {
+    std::string get_name() {
         return name;
     }
-    string get_artist() {
+    std::string get_artist() {
         return artist;
     }
     int get_rating() {
@@ -33,10 +42,10 @@ public:
     }
 };
 
-ostream &operator <<(ostream &os, const Song &obj) {
-    os << setw(20) << left << obj.name
-       << setw(30) << left << obj.artist
-       << setw(2)  << left << obj.rating;
+std::ostream &operator <<(std::ostream &os, const Song &obj) {
+    os << std::setw(20) << std::left << obj.name
+       << std::setw(30) << std::left << obj.artist
+       << std::setw(2)  << std::left << obj.rating;
     return os;
 }
 
@@ -50,23 +59,23 @@ void display_menu() {
     std::cout << "Enter a selection (Q to quit): ";
 }
 
-void play_current_song(const list<Song>::iterator &current_song) {
-    cout << "Playing:\n" << *current_song << endl;
+void play_current_song(const std::list<Song>::iterator &current_song) {
+    std::cout << "Playing:\n" << *current_song << std::endl;
 }
 
-void display_playlist(const list<Song> &playlist, list<Song>::iterator &current_song) {
+void display_playlist(const std::list<Song> &playlist, std::list<Song>::iterator &current_song) {
     for(const auto &song : playlist) {
-        cout << song << endl;
+        std::cout << song << std::endl;
     }
     play_current_song(current_song);
 }
 
-void play_first_song(const list<Song> &playlist) {
+void play_first_song(const std::list<Song> &playlist) {
     auto first_song_in_playlist = playlist.cbegin();
-    cout << "Playing:\n" << *first_song_in_playlist << endl;
+    std::cout << "Playing:\n" << *first_song_in_playlist << std::endl;
 }
 
-void play_next_song(list<Song> &playlist, list<Song>::iterator &current_song) {
+void play_next_song(std::list<Song> &playlist, std::list<Song>::iterator &current_song) {
     current_song++;
     if(current_song == playlist.end()) {
         current_song = playlist.begin();
@@ -74,7 +83,7 @@ void play_next_song(list<Song> &playlist, list<Song>::iterator &current_song) {
     play_current_song(current_song);
 }
 
-void play_previous_song(list<Song> &playlist, list<Song>::iterator &current_song_it) {
+void play_previous_song(std::list<Song> &playlist, std::list<Song>::iterator &current_song_it) {
     if(current_song_it == playlist.begin()) {
         current_song_it = playlist.end();
     }
@@ -83,34 +92,39 @@ void play_previous_song(list<Song> &playlist, list<Song>::iterator &current_song
 }
 
 bool IsRight(const int &val) {
-    return (val >=1 && val <=5);
+    return (val >= MINRATE && val <= MAXRATE);
 }
-void add_and_play_new_song(list<Song> &playlist, auto &current_song) {
+void add_and_play_new_song(std::list<Song> &playlist, auto &current_song) {
     std::cin.clear();
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
-    cout << "Adding and playing new song" << endl;
-    string song_name, song_artist;
+    std::cout << "Adding and playing new song" << std::endl;
+    std::string song_name;
+    std::string song_artist;
     int song_rating;
-    cout << "Enter song name:";
-    getline(cin, song_name);
+    std::cout << "Enter song name:";
+    getline(std::cin, song_name);
 
-    cout << "Enter song artist:";
-    getline(cin, song_artist);
+    std::cout << "Enter song artist:";
+    getline(std::cin, song_artist);
     do {
-    cout << "Enter your rating (1-5):";
-    cin >> song_rating;
+        std::cout << "Enter your rating (1-5):";
+        std::cin >> song_rating;
     } while(!IsRight(song_rating));
-
     
     playlist.insert(current_song, Song{song_name,song_artist,song_rating});
     current_song--;
     
 }
 
-
+char get_selection() {
+    char selection;
+    std::cin >> selection;
+    selection = toupper(selection);
+    return selection;
+}
 int main() {
 
-    list<Song> playlist{
+    std::list<Song> playlist{
             {"God's Plan",        "Drake",                     5},
             {"Never Be The Same", "Camila Cabello",            5},
             {"Pray For Me",       "The Weekend and K. Lamar",  4},
@@ -125,41 +139,38 @@ int main() {
     char selection{};
     do {
         display_menu();
-        cin >> selection;
-        selection = toupper(selection);
+        selection = get_selection();
         switch(selection) {
-            case 'F': 
+            case PLAYFIRST: 
                 play_first_song(playlist);
                 break;
 
-            case 'N':  
+            case PLAYNEXT:  
                 play_next_song(playlist, current_song);
                 break;
 
-            case 'P': 
+            case PLAYPRVIOUS: 
                 play_previous_song(playlist, current_song);
                 break;
 
-            case 'A':  
+            case ADD:  
                 add_and_play_new_song(playlist, current_song);
                 break;
 
-            case 'L': 
+            case LISTPLAYLIST: 
                 display_playlist(playlist, current_song);
                 break;
 
-            case 'Q': 
-                continue;
+            case QUIT: 
+                break;;
 
             default : 
-                cout << "You did smth wrong, try again!" << endl;
+                std::cout << "You did smth wrong, try again!" << std::endl;
                 break;
         }
-    } while (selection != 'q' && selection != 'Q');
+    } while (selection != QUIT);
     
-
-    cout << "Thanks for listening!" << endl;
-
+    std::cout << "Thanks for listening!" << std::endl;
 
     return 0;
 }
