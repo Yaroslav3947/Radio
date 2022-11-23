@@ -1,5 +1,6 @@
 #include <list>
 #include <limits>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <algorithm>
@@ -14,6 +15,8 @@ enum Selection {
     ADD = 'A',
     LISTPLAYLIST = 'L',
     QUIT = 'Q'
+};
+class OutOfFileIssue{
 };
 class Song {
     friend std::ostream &operator <<(std::ostream &os, const Song &obj);
@@ -113,7 +116,6 @@ void add_and_play_new_song(std::list<Song> &playlist, auto &current_song) {
     
     playlist.insert(current_song, Song{song_name,song_artist,song_rating});
     current_song--;
-    
 }
 
 char get_selection() {
@@ -122,16 +124,25 @@ char get_selection() {
     selection = toupper(selection);
     return selection;
 }
-int main() {
 
-    std::list<Song> playlist{
-            {"God's Plan",        "Drake",                     5},
-            {"Never Be The Same", "Camila Cabello",            5},
-            {"Pray For Me",       "The Weekend and K. Lamar",  4},
-            {"The Middle",        "Zedd, Maren Morris & Grey", 5},
-            {"Wait",              "Maroone 5",                 4},
-            {"Whatever It Takes", "Imagine Dragons",           3}          
-    };
+std::list<Song> get_playlist() {
+    std::list<Song> playlist;
+    std::ifstream in_file;
+    std::string name;
+    std::string singer;
+    int rate;
+    in_file.open("playlist.txt");
+    if(!in_file) {
+        OutOfFileIssue();
+    }
+    while (in_file >> name >> singer >> rate) {
+        playlist.emplace_back(Song{name,singer,rate});
+    }
+    return playlist;
+}
+
+void mainProblem() {
+    std::list <Song> playlist = get_playlist();
 
     auto current_song = playlist.begin();
 
@@ -162,7 +173,7 @@ int main() {
                 break;
 
             case QUIT: 
-                break;;
+                break;
 
             default : 
                 std::cout << "You did smth wrong, try again!" << std::endl;
@@ -171,6 +182,18 @@ int main() {
     } while (selection != QUIT);
     
     std::cout << "Thanks for listening!" << std::endl;
+}
+int main() {
+
+    try {
+        mainProblem();
+    }
+    catch(const OutOfFileIssue &e) {
+        std::cerr << "Problem with opening file" << '\n';
+    }
+    catch(const std::exception& e) {
+        std::cerr << e.what() << '\n';
+    }
 
     return 0;
 }
