@@ -115,6 +115,11 @@ void add_and_play_new_song(std::list<Song> &playlist, auto &current_song) {
     } while(!IsRight(song_rating));
     
     playlist.insert(current_song, Song{song_name,song_artist,song_rating});
+    // playlist.emplace_back(Song{song_name,song_artist,song_rating});
+    std::ofstream out_file;
+    out_file.open("playlist.txt", std::fstream::app);
+    out_file << song_name << "\t" << song_artist << "\t" << song_rating << '\n';
+
     current_song--;
 }
 
@@ -142,7 +147,7 @@ std::list<Song> get_playlist() {
 }
 
 void mainProblem() {
-    std::list <Song> playlist = get_playlist();
+    auto playlist = get_playlist();
 
     auto current_song = playlist.begin();
 
@@ -197,7 +202,3 @@ int main() {
 
     return 0;
 }
-
-
-
-
