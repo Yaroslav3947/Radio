@@ -138,7 +138,7 @@ std::list<Song> get_playlist() {
     int rate;
     in_file.open("playlist.txt");
     if(!in_file) {
-        OutOfFileIssue();
+        throw OutOfFileIssue();
     }
     while (in_file >> name >> singer >> rate) {
         playlist.emplace_back(Song{name,singer,rate});
